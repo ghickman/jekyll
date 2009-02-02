@@ -229,9 +229,16 @@ module Jekyll
     #                     "posts" => [<Post>],
     #                     "categories" => [<Post>]}
     def site_payload
+      all_posts = self.posts.sort { |a,b| b <=> a }
+      latest_posts = all_posts[0..2]
+      older_posts = all_posts[3..7]
+
       {"site" => self.config.merge({
           "time"       => Time.now,
-          "posts"      => self.posts.sort { |a,b| b <=> a },
+          "posts" => all_posts,
+          "latest_posts" => latest_posts,
+          "older_posts" => older_posts,
+          "categories" => post_attr_hash('categories'),
           "categories" => post_attr_hash('categories'),
           "tags"       => post_attr_hash('tags')})}
     end
