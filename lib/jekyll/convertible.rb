@@ -107,6 +107,7 @@ module Jekyll
     def render_haml_in_context(haml_engine, params={})
       context = Hashie::Mash.new(params)
       context.extend(HamlHelpers)
+      context.extend(::Helpers) if defined?(::Helpers)
       haml_engine.render(context)
     end
 
@@ -117,7 +118,7 @@ module Jekyll
     # Returns nothing
     def do_layout(payload, layouts)
       info = { :filters => [Jekyll::Filters], :registers => { :site => self.site } }
-      
+
       # render and transform content (this becomes the final content of the object)
       payload["content_type"] = self.content_type
 
@@ -149,7 +150,7 @@ module Jekyll
       # recursively render layouts
       layout = layouts[self.data["layout"]]
       while layout
-        
+
         payload = payload.deep_merge({"content" => self.output, "page" => layout.data})
 
         if site.config['haml'] && layout.content.is_a?(Haml::Engine)
