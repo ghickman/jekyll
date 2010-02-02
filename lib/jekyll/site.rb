@@ -97,9 +97,10 @@ module Jekyll
     def process
       self.reset
       self.read
+      self.read_archives
+      
       self.render
       self.write
-      self.read_archives
       self.write_archives
       
     end
