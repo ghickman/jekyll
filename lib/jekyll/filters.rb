@@ -42,6 +42,14 @@ module Jekyll
         "#{array[0...-1].join(', ')}, #{connector} #{array[-1]}"
       end
     end
+    
+    
+    def to_month(input)
+      return Date::MONTHNAMES[input.to_i]
+    end
 
+    def to_month_abbr(input)
+      return Date::ABBR_MONTHNAMES[input.to_i]
+    end
   end
 end

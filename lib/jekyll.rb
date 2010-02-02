@@ -27,7 +27,7 @@ require 'jekyll/tags/highlight'
 require 'jekyll/tags/include'
 require 'jekyll/albino'
 require 'jekyll/static_file'
-
+require 'jekyll/archive'
 module Jekyll
   # Default options. Overriden by values in _config.yml or command-line opts.
   # (Strings rather symbols used for compatability with YAML)

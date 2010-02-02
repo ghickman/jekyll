@@ -2,7 +2,7 @@ module Jekyll
 
   class Site
     attr_accessor :config, :layouts, :posts, :pages, :static_files, :categories, :exclude,
-                  :source, :dest, :lsi, :pygments, :permalink_style, :tags
+                  :source, :dest, :lsi, :pygments, :permalink_style, :tags, :collated
 
     # Initialize the site
     #   +config+ is a Hash containing site configurations details
@@ -29,6 +29,7 @@ module Jekyll
       self.static_files    = []
       self.categories      = Hash.new { |hash, key| hash[key] = [] }
       self.tags            = Hash.new { |hash, key| hash[key] = [] }
+      self.collated        = {}
     end
 
     def setup
@@ -98,6 +99,9 @@ module Jekyll
       self.read
       self.render
       self.write
+      self.read_archives
+      self.write_archives
+      
     end
 
     def read
@@ -145,7 +149,23 @@ module Jekyll
 
       self.posts.sort!
     end
-
+    
+    def read_archives
+      self.posts.reverse.each do |post|
+        y, m, d = post.date.year, post.date.month, post.date.day
+        unless self.collated.key? y
+          self.collated[ y ] = {}
+        end
+        unless self.collated[y].key? m
+          self.collated[ y ][ m ] = {}
+        end
+        unless self.collated[ y ][ m ].key? d
+          self.collated[ y ][ m ][ d ] = []
+        end
+        self.collated[ y ][ m ][ d ] += [ post ]
+      end
+    end
+    
     def render
       self.posts.each do |post|
         post.render(self.layouts, site_payload)
@@ -179,7 +199,38 @@ module Jekyll
         sf.write(self.dest)
       end
     end
+    
+    #   Write post archives to <dest>/<year>/, <dest>/<year>/<month>/,
+    #   <dest>/<year>/<month>/<day>/
+    #
+    #   Returns nothing
+    def write_archive( dir, type )
+        archive = Archive.new( self, self.source, dir, type )
+        archive.render( self.layouts, site_payload )
+        archive.write( self.dest )
+    end
 
+    def write_archives
+      self.collated.keys.each do |y|
+        if self.layouts.key? 'archive_yearly'
+          self.write_archive( y.to_s, 'archive_yearly' )
+        end
+
+        self.collated[ y ].keys.each do |m|
+          if self.layouts.key? 'archive_monthly'
+            self.write_archive( "%04d/%02d" % [ y.to_s, m.to_s ], 'archive_monthly' )
+          end
+
+          self.collated[ y ][ m ].keys.each do |d|
+            if self.layouts.key? 'archive_daily'
+              self.write_archive( "%04d/%02d/%02d" % [ y.to_s, m.to_s, d.to_s ], 'archive_daily' )
+            end
+          end
+        end
+      end
+    end
+
+    
     # Reads the directories and finds posts, pages and static files that will 
     # become part of the valid site according to the rules in +filter_entries+.
     #   The +dir+ String is a relative path used to call this method
@@ -227,6 +278,7 @@ module Jekyll
     #
     # Returns {"site" => {"time" => <Time>,
     #                     "posts" => [<Post>],
+     #                     "collated_posts" => [<Post>],
     #                     "categories" => [<Post>]}
     def site_payload
       all_posts = self.posts.sort { |a,b| b <=> a }
@@ -240,6 +292,7 @@ module Jekyll
           "older_posts" => older_posts,
           "categories" => post_attr_hash('categories'),
           "categories" => post_attr_hash('categories'),
+          "collated_posts"  =>  self.collated,
           "tags"       => post_attr_hash('tags')})}
     end
 
