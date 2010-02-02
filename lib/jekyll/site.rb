@@ -97,17 +97,16 @@ module Jekyll
     def process
       self.reset
       self.read
-      self.read_archives
       
       self.render
       self.write
-      self.write_archives
       
     end
 
     def read
       self.read_layouts # existing implementation did this at top level only so preserved that
       self.read_directories
+      self.read_archives
     end
 
     # Read all the files in <source>/<dir>/_layouts and create a new Layout
@@ -199,6 +198,7 @@ module Jekyll
       self.static_files.each do |sf|
         sf.write(self.dest)
       end
+      self.write_archives
     end
     
     #   Write post archives to <dest>/<year>/, <dest>/<year>/<month>/,
