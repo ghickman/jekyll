@@ -51,5 +51,12 @@ module Jekyll
     def to_month_abbr(input)
       return Date::ABBR_MONTHNAMES[input.to_i]
     end
+    
+    def to_month_integer(int)
+      case int.to_s.size
+      when 1 then '0' + int.to_s
+      when 2 then int
+      end
+    end
   end
 end
