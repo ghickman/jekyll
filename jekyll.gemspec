@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Tom Preston-Werner"]
-  s.date = %q{2010-01-12}
+  s.date = %q{2010-02-01}
   s.default_executable = %q{jekyll}
   s.description = %q{Jekyll is a simple, blog aware, static site generator.}
   s.email = %q{tom@mojombo.com}
@@ -37,6 +37,7 @@ Gem::Specification.new do |s|
      "jekyll.gemspec",
      "lib/jekyll.rb",
      "lib/jekyll/albino.rb",
+     "lib/jekyll/archive.rb",
      "lib/jekyll/converters/csv.rb",
      "lib/jekyll/converters/mephisto.rb",
      "lib/jekyll/converters/mt.rb",
@@ -57,6 +58,9 @@ Gem::Specification.new do |s|
      "test/helper.rb",
      "test/source/_includes/sig.markdown",
      "test/source/_layouts/default.html",
+     "test/source/_layouts/archive_daily.html",
+     "test/source/_layouts/archive_monthly.html",
+     "test/source/_layouts/archive_yearly.html",
      "test/source/_layouts/simple.html",
      "test/source/_posts/2008-02-02-not-published.textile",
      "test/source/_posts/2008-02-02-published.textile",
