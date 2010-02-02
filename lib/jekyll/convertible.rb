@@ -11,7 +11,11 @@ module Jekyll
   module Convertible
     # Return the contents as a string
     def to_s
-      self.content || ''
+      if self.respond_to?(:extended)
+        (self.content || '') + (self.extended || '')
+      else
+        self.content || ''
+      end
     end
 
     # Read the YAML frontmatter
@@ -21,13 +25,20 @@ module Jekyll
     # Returns nothing
     def read_yaml(base, name)
       self.content = File.read(File.join(base, name))
-      
+
       if self.content =~ /^(---\s*\n.*?\n?)^(---\s*$\n?)/m
         self.content = self.content[($1.size + $2.size)..-1]
-      
+
         self.data = YAML.load($1)
+        # if we have an extended section, separate that from content
+        if self.respond_to?(:extended)
+          if self.data && self.data.key?('extended')
+            marker = self.data['extended']
+            self.content, self.extended = self.content.split(marker + "\n", 2)
+          end
+        end
       end
-      
+
       self.data ||= {}
     end
 
@@ -39,9 +50,15 @@ module Jekyll
       when 'textile'
         self.ext = ".html"
         self.content = self.site.textile(self.content)
+        if self.respond_to?(:extended) and self.extended
+          self.extended = RedCloth.new(self.extended).to_html
+        end
       when 'markdown'
         self.ext = ".html"
         self.content = self.site.markdown(self.content)
+        if self.respond_to?(:extended) and self.extended
+          self.extended = self.site.markdown(self.extended)
+        end
       end
     end
 
@@ -66,18 +83,26 @@ module Jekyll
     # Returns nothing
     def do_layout(payload, layouts)
       info = { :filters => [Jekyll::Filters], :registers => { :site => self.site } }
-
+      
       # render and transform content (this becomes the final content of the object)
       payload["content_type"] = self.content_type
       self.content = Liquid::Template.parse(self.content).render(payload, info)
+      if self.respond_to?(:extended) && self.extended
+        self.extended = Liquid::Template.parse(self.extended).render(payload, info)
+      end
       self.transform
 
       # output keeps track of what will finally be written
-      self.output = self.content
+      if self.respond_to?(:extended) && self.extended
+        self.output = self.content + self.extended
+      else
+        self.output = self.content
+      end
 
       # recursively render layouts
       layout = layouts[self.data["layout"]]
       while layout
+        
         payload = payload.deep_merge({"content" => self.output, "page" => layout.data})
         self.output = Liquid::Template.parse(layout.content).render(payload, info)
 
