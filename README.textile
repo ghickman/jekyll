@@ -38,7 +38,7 @@ h2. Developer Dependencies
 
 h2. Changes in this fork
 
-I have combined commits from several other forks from cantorrodista and newbamboo -- so thanks for them :)
+I have combined commits from several other forks from "cantorrodista":http://github.com/cantorrodista/jekyll and "newbamboo":http://github.com/newbamboo/jekyll -- so thanks for them :)
 
 * Provided a latests posts and older posts list, for use on the front page.
 * Support for creating archive pages.
