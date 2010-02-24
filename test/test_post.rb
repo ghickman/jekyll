@@ -268,7 +268,7 @@ class TestPost < Test::Unit::TestCase
         assert post.tags.include?('cooking')
         assert post.tags.include?('pizza')
       end
-      
+
       should "recognize empty tag in yaml" do
         post = setup_post("2009-05-18-empty-tag.textile")
         assert_equal [], post.tags
@@ -278,7 +278,7 @@ class TestPost < Test::Unit::TestCase
         post = setup_post("2009-05-18-empty-tags.textile")
         assert_equal [], post.tags
       end
-      
+
 
       should "recognize extended in yaml" do
         post = setup_post("2009-10-28-extended-post.markdown")
@@ -315,7 +315,7 @@ class TestPost < Test::Unit::TestCase
         end
 
         should "render properly if a extended post" do
-          
+
           post = setup_post("2009-10-28-extended-post.markdown")
           do_render(post)
           assert_equal "<p>This is an introduction</p>", post.content

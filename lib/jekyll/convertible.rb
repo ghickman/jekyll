@@ -83,7 +83,7 @@ module Jekyll
     # Returns nothing
     def do_layout(payload, layouts)
       info = { :filters => [Jekyll::Filters], :registers => { :site => self.site } }
-      
+
       # render and transform content (this becomes the final content of the object)
       payload["content_type"] = self.content_type
       self.content = Liquid::Template.parse(self.content).render(payload, info)
@@ -102,7 +102,7 @@ module Jekyll
       # recursively render layouts
       layout = layouts[self.data["layout"]]
       while layout
-        
+
         payload = payload.deep_merge({"content" => self.output, "page" => layout.data})
         self.output = Liquid::Template.parse(layout.content).render(payload, info)
 

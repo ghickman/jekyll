@@ -97,10 +97,10 @@ module Jekyll
     def process
       self.reset
       self.read
-      
+
       self.render
       self.write
-      
+
     end
 
     def read
@@ -149,7 +149,7 @@ module Jekyll
 
       self.posts.sort!
     end
-    
+
     def read_archives
       self.posts.reverse.each do |post|
         y, m, d = post.date.year, post.date.month, post.date.day
@@ -165,7 +165,7 @@ module Jekyll
         self.collated[ y ][ m ][ d ] += [ post ]
       end
     end
-    
+
     def render
       self.posts.each do |post|
         post.render(self.layouts, site_payload)
@@ -200,7 +200,7 @@ module Jekyll
       end
       self.write_archives
     end
-    
+
     #   Write post archives to <dest>/<year>/, <dest>/<year>/<month>/,
     #   <dest>/<year>/<month>/<day>/
     #
@@ -231,8 +231,8 @@ module Jekyll
       end
     end
 
-    
-    # Reads the directories and finds posts, pages and static files that will 
+
+    # Reads the directories and finds posts, pages and static files that will
     # become part of the valid site according to the rules in +filter_entries+.
     #   The +dir+ String is a relative path used to call this method
     #            recursively as it descends through directories
