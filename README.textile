@@ -36,6 +36,14 @@ h2. Developer Dependencies
 * RR: Mocking (Ruby)
 * RedGreen: Nicer test output (Ruby)
 
+h2. Changes in this fork
+
+I have combined commits from several other forks from cantorrodista and newbamboo -- so thanks for them :)
+
+* Provided a latests posts and older posts list, for use on the front page.
+* Support for creating archive pages.
+* Support for having post summaries.
+
 h2. License
 
 (The MIT License)
