@@ -151,18 +151,12 @@ module Jekyll
     end
 
     def read_archives
-      self.posts.reverse.each do |post|
+      self.collated = self.posts.reverse.inject({}) do |result, post|
         y, m, d = post.date.year, post.date.month, post.date.day
-        unless self.collated.key? y
-          self.collated[ y ] = {}
-        end
-        unless self.collated[y].key? m
-          self.collated[ y ][ m ] = {}
-        end
-        unless self.collated[ y ][ m ].key? d
-          self.collated[ y ][ m ][ d ] = []
-        end
-        self.collated[ y ][ m ][ d ] += [ post ]
+        result[y] ||= {}
+        result[y][m] ||= {}
+        (result[y][m][d] ||= []) << post
+        result
       end
     end
 
