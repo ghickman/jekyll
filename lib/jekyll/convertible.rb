@@ -59,6 +59,13 @@ module Jekyll
         if self.respond_to?(:extended) and self.extended
           self.extended = self.site.markdown(self.extended)
         end
+      when 'haml'
+        self.ext = '.html'
+        self.content = Haml::Engine.new(self.content, :attr_wrapper => %{"})
+        if self.respond_to?(:extended) and self.extended
+          self.extended = Haml::Engine.new(self.self.extended,
+            :attr_wrapper => %{"})
+        end
       end
     end
 
@@ -72,8 +79,20 @@ module Jekyll
         return 'textile'
       when /markdown/i, /mkdn/i, /md/i, /mkd/i
         return 'markdown'
+      when /haml/i
+        return 'haml'
       end
       return 'unknown'
+    end
+
+    # Sets up a context for Haml and renders in it. The context has accessors
+    # matching the passed-in hash, e.g. "site", "page" and "content", and has
+    # helper modules mixed in.
+    #
+    # Returns String.
+    def render_haml_in_context(haml_engine, params={})
+      context = ClosedStruct.new(params)
+      haml_engine.render(context)
     end
 
     # Add any necessary layouts to this convertible document
@@ -86,11 +105,22 @@ module Jekyll
 
       # render and transform content (this becomes the final content of the object)
       payload["content_type"] = self.content_type
-      self.content = Liquid::Template.parse(self.content).render(payload, info)
-      if self.respond_to?(:extended) && self.extended
-        self.extended = Liquid::Template.parse(self.extended).render(payload, info)
+
+      if self.content_type == "haml"
+        self.transform
+        self.content = render_haml_in_context(self.content, :site => self.site,
+          :page => ClosedStruct.new(payload["page"]))
+        if self.respond_to?(:extended) && self.extended
+          self.extended = render_haml_in_context(self.extended,
+            :site => self.site, :page => ClosedStruct.new(payload["page"]))
+        end
+      else
+        self.content = Liquid::Template.parse(self.content).render(payload, info)
+        if self.respond_to?(:extended) && self.extended
+          self.extended = Liquid::Template.parse(self.extended).render(payload, info)
+        end
+        self.transform
       end
-      self.transform
 
       # output keeps track of what will finally be written
       if self.respond_to?(:extended) && self.extended
@@ -102,9 +132,15 @@ module Jekyll
       # recursively render layouts
       layout = layouts[self.data["layout"]]
       while layout
-
         payload = payload.deep_merge({"content" => self.output, "page" => layout.data})
-        self.output = Liquid::Template.parse(layout.content).render(payload, info)
+        if site.config['haml'] && layout.content.is_a?(Haml::Engine)
+          self.output = render_haml_in_context(layout.content,
+            :site => ClosedStruct.new(payload["site"]),
+            :page => ClosedStruct.new(payload["page"]),
+            :content => payload["content"])
+        else
+          self.output = Liquid::Template.parse(layout.content).render(payload, info)
+        end
 
         layout = layouts[layout.data["layout"]]
       end
