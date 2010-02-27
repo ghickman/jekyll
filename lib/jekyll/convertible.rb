@@ -107,12 +107,17 @@ module Jekyll
       payload["content_type"] = self.content_type
 
       if self.content_type == "haml"
+        haml_payload = {
+          :site => self.site,
+          :page => ClosedStruct.new(payload['page'])
+        }
+        haml_payload.merge!(
+          :paginator => ClosedStruct.new(payload['paginator'])
+        ) unless payload['paginator'].nil?
         self.transform
-        self.content = render_haml_in_context(self.content, :site => self.site,
-          :page => ClosedStruct.new(payload["page"]))
+        self.content = render_haml_in_context(self.content, haml_payload)
         if self.respond_to?(:extended) && self.extended
-          self.extended = render_haml_in_context(self.extended,
-            :site => self.site, :page => ClosedStruct.new(payload["page"]))
+          self.extended = render_haml_in_context(self.extended, haml_payload)
         end
       else
         self.content = Liquid::Template.parse(self.content).render(payload, info)
@@ -133,11 +138,18 @@ module Jekyll
       layout = layouts[self.data["layout"]]
       while layout
         payload = payload.deep_merge({"content" => self.output, "page" => layout.data})
+
         if site.config['haml'] && layout.content.is_a?(Haml::Engine)
-          self.output = render_haml_in_context(layout.content,
-            :site => ClosedStruct.new(payload["site"]),
-            :page => ClosedStruct.new(payload["page"]),
-            :content => payload["content"])
+          haml_payload = {
+            :site => ClosedStruct.new(payload['site']),
+            :page => ClosedStruct.new(payload['page']),
+            :content => payload['content']
+          }
+          haml_payload.merge!(
+            :paginator => ClosedStruct.new(payload['paginator'])
+          ) unless payload['paginator'].nil?
+
+          self.output = render_haml_in_context(layout.content, haml_payload)
         else
           self.output = Liquid::Template.parse(layout.content).render(payload, info)
         end

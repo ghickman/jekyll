@@ -9,7 +9,7 @@ module Jekyll
     end
     
     def self.pagination_enabled?(config, file)
-      file == 'index.html' && !config['paginate'].nil?
+      %w(index.html index.haml).include?(file) && !config['paginate'].nil?
     end
     
     def initialize(config, page, all_posts, num_pages = nil)
