@@ -31,6 +31,23 @@ module Jekyll
       self.data ||= {}
     end
 
+    # Generate a usable hash of HAML options from _config.yml.
+    #
+    # Returns hash
+    def haml_engine_options
+      # Default to using " for attribute wrapping, this can be overridden in
+      # the _config.yml if needs be? O_o
+      options = { :attr_wrapper => %{"} }
+      # Convert the keys to symbols, so we don't have to do
+      # ::format in the yml.
+      options.merge!(site.config['haml'].inject({}) { |result, item|
+        result[item.first.to_sym] = item.last
+        result
+      }) if site.config['haml'].is_a?(Hash)
+
+      options
+    end
+
     # Transform the contents based on the file extension.
     #
     # Returns nothing
@@ -44,14 +61,14 @@ module Jekyll
         self.content = self.site.markdown(self.content)
       when 'haml'
         self.ext = '.html'
-        self.content = Haml::Engine.new(self.content, :attr_wrapper => %{"})
+        self.content = Haml::Engine.new(self.content, self.haml_engine_options)
       end
     end
 
     # Determine which formatting engine to use based on this convertible's
     # extension
     #
-    # Returns one of :textile, :markdown or :unknown
+    # Returns one of :textile, :markdown, :haml or :unknown
     def content_type
       case self.ext[1..-1]
       when /textile/i
