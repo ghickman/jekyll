@@ -20,7 +20,7 @@ module Jekyll
 
     attr_accessor :site
     attr_accessor :data, :content, :output, :ext
-    attr_accessor :date, :slug, :published, :tags, :categories, :extended
+    attr_accessor :date, :slug, :published, :tags, :categories
 
     # Initialize this Post instance.
     #   +site+ is the Site
@@ -208,7 +208,6 @@ module Jekyll
         "categories" => self.categories,
         "next"       => self.next,
         "previous"   => self.previous,
-        "extended"   => self.extended || "",
         "tags"       => self.tags,
         "content"    => self.content }.deep_merge(self.data)
     end

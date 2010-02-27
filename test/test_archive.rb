@@ -21,7 +21,7 @@ class TestArchive < Test::Unit::TestCase
 
     should "have to collated posts in years, month and days" do
       assert_equal(5, @site.collated[2008].size)
-      assert_equal(5, @site.collated[2009].size)
+      assert_equal(4, @site.collated[2009].size)
       assert_equal(1, @site.collated[2010].size)
       assert_equal(2, @site.collated[2010][1].size)
       assert_equal(2, @site.collated[2009][5].size)
