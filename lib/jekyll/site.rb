@@ -233,12 +233,30 @@ module Jekyll
       end
     end
 
+    # Converts the collated posts nested hash into an array of post objects.
+    #
+    # For example:
+    # archive_posts(self.collated[y])
+    # archive_posts(self.collated[y][m])
+    def archive_posts(posts)
+      posts.inject([]) do |result, item|
+        if item.last.is_a?(Hash)
+          item = item.last.to_a.map { |d| d.last }.flatten
+        else
+          item = item.last
+        end
+
+        result = result | item
+      end
+    end
+
     #   Write post archives to <dest>/<year>/, <dest>/<year>/<month>/,
     #   <dest>/<year>/<month>/<day>/
     #
     #   Returns nothing
-    def write_archive( dir, type )
+    def write_archive( dir, type, posts )
         archive = Archive.new( self, self.source, dir, type )
+        archive.set_posts!(posts)
         archive.render( self.layouts, site_payload )
         archive.write( self.dest )
     end
@@ -246,17 +264,20 @@ module Jekyll
     def write_archives
       self.collated.keys.each do |y|
         if self.layouts.key? 'archive_yearly'
-          self.write_archive( y.to_s, 'archive_yearly' )
+          self.write_archive(y.to_s, 'archive_yearly',
+            self.archive_posts(self.collated[y]))
         end
 
         self.collated[ y ].keys.each do |m|
           if self.layouts.key? 'archive_monthly'
-            self.write_archive( "%04d/%02d" % [ y.to_s, m.to_s ], 'archive_monthly' )
+            self.write_archive("%04d/%02d" % [ y.to_s, m.to_s ],
+              'archive_monthly', self.archive_posts(self.collated[y][m]))
           end
 
           self.collated[ y ][ m ].keys.each do |d|
             if self.layouts.key? 'archive_daily'
-              self.write_archive( "%04d/%02d/%02d" % [ y.to_s, m.to_s, d.to_s ], 'archive_daily' )
+              self.write_archive("%04d/%02d/%02d" % [ y.to_s, m.to_s, d.to_s ],
+              'archive_daily', self.collated[y][m][d])
             end
           end
         end

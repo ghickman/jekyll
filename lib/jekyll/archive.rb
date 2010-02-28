@@ -17,6 +17,9 @@ module Jekyll
 
       self.read_yaml(File.join(base, '_layouts'), type + ext)
 
+      # Default to an empty list of posts.
+      self.set_posts!([])
+
       year, month, day = dir.split('/')
       self.data['year'] = year.to_i
       month and self.data['month'] = month.to_i
@@ -24,9 +27,17 @@ module Jekyll
 
       unless self.data['title'].nil?
         self.data['title'].gsub!(/%year%/, year)
-        self.data['title'].gsub!(/%month%/, month) if month
+        if month
+          self.data['title'].gsub!(/%month%/, month)
+          self.data['title'].gsub!(/%str_month%/, Date::MONTHNAMES[month.to_i])
+        end
         self.data['title'].gsub!(/%day%/, day) if day
+        self.data['title'].gsub!(/%str_day%/, Date::DAYNAMES[day.to_i])
       end
+    end
+
+    def set_posts!(posts=nil)
+      self.data['archive_posts'] = posts unless posts.nil?
     end
   end
 
