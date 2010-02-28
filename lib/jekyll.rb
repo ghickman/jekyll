@@ -28,6 +28,7 @@ require 'jekyll/tags/include'
 require 'jekyll/albino'
 require 'jekyll/static_file'
 require 'jekyll/archive'
+require 'jekyll/category_listing'
 module Jekyll
   # Default options. Overriden by values in _config.yml or command-line opts.
   # (Strings rather symbols used for compatability with YAML)
@@ -43,6 +44,8 @@ module Jekyll
     'pygments'     => false,
     'markdown'     => 'maruku',
     'permalink'    => 'date',
+
+    'categories_dir' => 'category',
 
     'maruku'       => {
       'use_tex'    => false,

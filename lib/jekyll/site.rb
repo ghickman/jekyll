@@ -215,6 +215,22 @@ module Jekyll
         sf.write(self.dest)
       end
       self.write_archives
+      self.write_category_listings
+    end
+
+    def write_category_listing(dir, cat, posts)
+      category = CategoryListing.new(self, self.source, dir, cat, posts)
+      category.render(self.layouts, site_payload)
+      category.write(self.dest)
+    end
+
+    def write_category_listings
+      return unless self.layouts.key?('category_index')
+
+      self.categories.each do |cat, posts|
+        self.write_category_listing(File.join(
+          self.config['categories_dir'], cat.downcase), cat, posts)
+      end
     end
 
     #   Write post archives to <dest>/<year>/, <dest>/<year>/<month>/,
