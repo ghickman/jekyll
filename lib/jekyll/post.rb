@@ -197,11 +197,18 @@ module Jekyll
       end
     end
 
+    # The title of the post
+    #
+    # Returns string
+    def title
+      self.data["title"] || self.slug.split('-').select {|w| w.capitalize! || w }.join(' ')
+    end
+
     # Convert this post into a Hash for use in Liquid templates.
     #
     # Returns <Hash>
     def to_liquid
-      { "title"      => self.data["title"] || self.slug.split('-').select {|w| w.capitalize! || w }.join(' '),
+      { "title"      => self.title,
         "url"        => self.url,
         "date"       => self.date,
         "id"         => self.id,
