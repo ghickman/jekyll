@@ -28,7 +28,7 @@ module Jekyll
 
     # Some helpers related to archive support.
     def days_to_post_count(days=[])
-      days.inject(0) {|res, days| res = res + days.length }
+      days.inject(0) {|res, days| res + days.last.length }
     end
 
     def to_month(input)

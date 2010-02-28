@@ -24,11 +24,12 @@ module Jekyll
 
       if self.content =~ /^(---\s*\n.*?\n?)^(---\s*$\n?)/m
         self.content = self.content[($1.size + $2.size)..-1]
-
         self.data = YAML.load($1)
       end
 
       self.data ||= {}
+
+      self.data = Hashie::Mash.new(self.data) if self.site.config['haml']
     end
 
     # Generate a usable hash of HAML options from _config.yml.
@@ -87,7 +88,7 @@ module Jekyll
     #
     # Returns String.
     def render_haml_in_context(haml_engine, params={})
-      context = ClosedStruct.new(params)
+      context = Hashie::Mash.new(params)
       context.extend(HamlHelpers)
       haml_engine.render(context)
     end
@@ -106,10 +107,10 @@ module Jekyll
       if self.content_type == "haml"
         haml_payload = {
           :site => self.site,
-          :page => ClosedStruct.new(payload['page'])
+          :page => Hashie::Mash.new(payload['page'])
         }
         haml_payload.merge!(
-          :paginator => ClosedStruct.new(payload['paginator'])
+          :paginator => Hashie::Mash.new(payload['paginator'])
         ) unless payload['paginator'].nil?
         self.transform
         self.content = render_haml_in_context(self.content, haml_payload)
@@ -128,12 +129,12 @@ module Jekyll
 
         if site.config['haml'] && layout.content.is_a?(Haml::Engine)
           haml_payload = {
-            :site => ClosedStruct.new(payload['site']),
-            :page => ClosedStruct.new(payload['page']),
+            :site => Hashie::Mash.new(payload['site']),
+            :page => Hashie::Mash.new(payload['page']),
             :content => payload['content']
           }
           haml_payload.merge!(
-            :paginator => ClosedStruct.new(payload['paginator'])
+            :paginator => Hashie::Mash.new(payload['paginator'])
           ) unless payload['paginator'].nil?
 
           self.output = render_haml_in_context(layout.content, haml_payload)

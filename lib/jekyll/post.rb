@@ -173,7 +173,6 @@ module Jekyll
         "page" => self.to_liquid
       }
       payload = payload.deep_merge(site_payload)
-
       do_layout(payload, layouts)
     end
 

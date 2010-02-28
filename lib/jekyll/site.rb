@@ -41,10 +41,15 @@ module Jekyll
 
       if self.config['haml']
         begin
+          require 'hashie'
+        rescue LoadError
+          puts 'you must have the hashie gem installed for haml support'
+        end
+        begin
           require 'haml'
           require 'jekyll/haml_helpers'
         rescue LoadError
-          'You must have the haml gem installed first'
+          puts 'You must have the haml gem installed first'
         end
       end
 
