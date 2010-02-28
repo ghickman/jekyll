@@ -168,7 +168,7 @@ module Jekyll
         self.latest_posts = sorted_posts[0..2]
         self.older_posts = sorted_posts[3..5]
       else
-        self.latest_posts = self.older_posts = sorted_posts
+        self.latest_posts = sorted_posts
       end
     end
 
