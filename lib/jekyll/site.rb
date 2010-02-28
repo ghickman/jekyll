@@ -1,8 +1,9 @@
 module Jekyll
 
   class Site
-    attr_accessor :config, :layouts, :posts, :pages, :static_files, :categories, :exclude,
-                  :source, :dest, :lsi, :pygments, :permalink_style, :tags, :collated
+    attr_accessor :config, :layouts, :posts, :latest_posts, :older_posts,
+                  :pages, :static_files, :categories, :exclude, :source, :dest,
+                  :lsi, :pygments, :permalink_style, :tags, :collated
 
     # Initialize the site
     #   +config+ is a Hash containing site configurations details
@@ -25,11 +26,13 @@ module Jekyll
     def reset
       self.layouts         = {}
       self.posts           = []
+      self.latest_posts    = []
+      self.older_posts     = []
+      self.collated        = {}
       self.pages           = []
       self.static_files    = []
       self.categories      = Hash.new { |hash, key| hash[key] = [] }
       self.tags            = Hash.new { |hash, key| hash[key] = [] }
-      self.collated        = {}
     end
 
     def setup
@@ -157,6 +160,16 @@ module Jekyll
       end
 
       self.posts.sort!
+
+      # Now build the latest/older posts.
+      sorted_posts = self.posts.sort { |a,b| b <=> a }
+      # Check we have enough posts to do the split first.
+      if sorted_posts.length >= 4
+        self.latest_posts = sorted_posts[0..2]
+        self.older_posts = sorted_posts[3..5]
+      else
+        self.latest_posts = self.older_posts = sorted_posts
+      end
     end
 
     def read_archives
@@ -285,19 +298,14 @@ module Jekyll
      #                     "collated_posts" => [<Post>],
     #                     "categories" => [<Post>]}
     def site_payload
-      all_posts = self.posts.sort { |a,b| b <=> a }
-      latest_posts = all_posts[0..2]
-      older_posts = all_posts[3..7]
-
       {"site" => self.config.merge({
-          "time"       => Time.now,
-          "posts" => all_posts,
-          "latest_posts" => latest_posts,
-          "older_posts" => older_posts,
+          "time" => Time.now,
+          "posts" => self.posts.sort { |a,b| b <=> a },
+          "latest_posts" => self.latest_posts,
+          "older_posts" => self.older_posts,
+          "collated_posts" => self.collated,
           "categories" => post_attr_hash('categories'),
-          "categories" => post_attr_hash('categories'),
-          "collated_posts"  =>  self.collated,
-          "tags"       => post_attr_hash('tags')})}
+          "tags" => post_attr_hash('tags')})}
     end
 
     # Filter out any files/directories that are hidden or backup files (start
