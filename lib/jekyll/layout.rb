@@ -4,7 +4,7 @@ module Jekyll
     include Convertible
 
     attr_accessor :site
-    attr_accessor :ext
+    attr_accessor :name, :ext
     attr_accessor :data, :content
 
     # Initialize a new Layout.
