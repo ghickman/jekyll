@@ -39,6 +39,7 @@ module Jekyll
       if self.config['haml']
         begin
           require 'haml'
+          require 'jekyll/haml_helpers'
         rescue LoadError
           'You must have the haml gem installed first'
         end

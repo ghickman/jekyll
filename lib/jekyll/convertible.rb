@@ -88,6 +88,7 @@ module Jekyll
     # Returns String.
     def render_haml_in_context(haml_engine, params={})
       context = ClosedStruct.new(params)
+      context.extend(HamlHelpers)
       haml_engine.render(context)
     end
 
