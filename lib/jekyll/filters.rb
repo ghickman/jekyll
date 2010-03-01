@@ -59,8 +59,8 @@ module Jekyll
       end
     end
 
-    def gist(id)
-      js = open("http://gist.github.com/#{id}.js").read
+    def gist(id, file='')
+      js = open("http://gist.github.com/#{id}.js?file=#{CGI.escape(file)}").read
       js.match(/document.write\('(<div.+)'\)/)[1].gsub(/\\"/, '"').gsub(/\\\//, '/').gsub(/\\n/, '')
     end
   end
