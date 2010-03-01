@@ -61,7 +61,7 @@ module Jekyll
         self.ext = ".html"
         self.content = self.site.markdown(self.content)
       when 'haml'
-        self.ext = '.html'
+        self.ext = self.data[:output_ext] || '.html'
         self.content = Haml::Engine.new(self.content, self.haml_engine_options)
       end
     end

@@ -46,7 +46,8 @@ module Jekyll
       if self.site.permalink_style == :pretty && !index?
         "/:name/"
       else
-        "/:name.html"
+        output_ext = self.data[:output_ext] || '.html'
+        "/:name#{output_ext}"
       end
     end
 
@@ -56,8 +57,8 @@ module Jekyll
     # Returns <String>
     def url
       return permalink if permalink
-
-      @url ||= (ext == '.html') ? template.gsub(':name', basename) : "/#{name}"
+      output_ext = self.data[:output_ext] || '.html'
+      @url ||= (ext == output_ext) ? template.gsub(':name', basename) : "/#{name}"
     end
 
     # Extract information from the page filename
