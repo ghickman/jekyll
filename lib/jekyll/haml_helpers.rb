@@ -3,8 +3,12 @@ require 'cgi'
 module Jekyll
   module HamlHelpers
 
-    def h(text)
-      CGI.escapeHTML(text)
+    def xml_escape(input)
+      CGI.escapeHTML(input)
+    end
+
+    def cgi_escape(input)
+      CGI::escape(input)
     end
 
     # Taken from github.com/imathis/octopress
