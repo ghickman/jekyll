@@ -60,7 +60,20 @@ module Jekyll
     end
 
     def gist(id, file='')
-      js = open("http://gist.github.com/#{id}.js?file=#{CGI.escape(file)}").read
+      # If the cache folder exists then attempt to find a cached version.
+      if File.directory?('_gist_cache')
+        cache = File.join(
+          'gist_cache', "#{id}_#{file.gsub(/[^A-Za-z0-9\._]/, '_')}")
+        js = open(cache).read if File.exists?(cache)
+      end
+      # If we have no cached version get the normal one.
+      js ||= open("http://gist.github.com/#{id}.js?file=#{CGI.escape(file)}").read
+
+      # If we don't arleady have a cached and the directory exists create one.
+      if File.directory?('_gist_cache') && !File.exists?(cache)
+        File.open(cache, 'w') { |f| f.write(js) }
+      end
+
       js.match(/document.write\('(<div.+)'\)/)[1].gsub(/\\"/, '"').gsub(/\\\//, '/').gsub(/\\n/, '')
     end
   end
