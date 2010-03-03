@@ -63,7 +63,7 @@ module Jekyll
       # If the cache folder exists then attempt to find a cached version.
       if File.directory?('_gist_cache')
         cache = File.join(
-          'gist_cache', "#{id}_#{file.gsub(/[^A-Za-z0-9\._]/, '_')}")
+          '_gist_cache', "#{id}_#{file.gsub(/[^A-Za-z0-9\._]/, '_')}")
         js = open(cache).read if File.exists?(cache)
       end
       # If we have no cached version get the normal one.
