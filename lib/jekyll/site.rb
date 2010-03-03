@@ -233,8 +233,10 @@ module Jekyll
       return unless self.layouts.key?('category_index')
 
       self.categories.each do |cat, posts|
+        # Convert the category name to something valid for folder name.
         self.write_category_listing(File.join(
-          self.config['categories_dir'], cat.downcase), cat, posts)
+          self.config['categories_dir'],
+          cat.downcase.gsub(/[^A-Za-z0-9.\-]/, '-')), cat, posts)
       end
     end
 

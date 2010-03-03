@@ -6,6 +6,7 @@ module Jekyll
     def xml_escape(input)
       CGI.escapeHTML(input)
     end
+    alias :h :xml_escape
 
     def cgi_escape(input)
       CGI::escape(input)
