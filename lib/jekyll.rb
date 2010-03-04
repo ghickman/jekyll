@@ -9,7 +9,11 @@ require 'time'
 require 'yaml'
 
 # stdlib
-require 'open-uri'
+begin
+  require 'patron'
+rescue LoadError
+  puts 'The patron gem is required for gist support!'
+end
 
 # 3rd party
 require 'liquid'
@@ -47,6 +51,8 @@ module Jekyll
     'permalink'    => 'date',
 
     'categories_dir' => 'category',
+
+    'reload_gists' => false,
 
     'maruku'       => {
       'use_tex'    => false,

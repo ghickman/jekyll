@@ -60,20 +60,56 @@ module Jekyll
     end
 
     def gist(id, file='')
-      cache_dir = @context.registers[:site].config['gist_cache']
+      config = @context.registers[:site].config
+      cache_dir = config['gist_cache']
 
-      # If the cache folder exists then attempt to find a cached version.
-      if cache_dir && File.directory?(cache_dir)
-        cache = File.join(
-          cache_dir, "#{id}_#{file.gsub(/[^A-Za-z0-9\._]/, '_')}")
-        js = open(cache).read if File.exists?(cache)
+      # Is cache enabled?
+      if cache_dir
+        # Construct the filenames for the cache and etags store; file_id is used
+        # as the etag key and also the gist cache filename.
+        file_id = "#{id}_#{file.gsub(/[^A-Za-z0-9\._]/, '_')}"
+        filename = File.join(cache_dir, file_id)
+        etag_filename = File.join(cache_dir, 'etags.yml')
+
+        # Create the cache directory if it doesn't exist.
+        FileUtils.mkdir_p(cache_dir) unless File.directory?(cache_dir)
+
+        begin
+          # Attempt to load the etags YAML store, if it isn't aleady loaded.
+          @etags_store ||= YAML::load_file(etag_filename)
+          # Now attempt to load the cache file.
+          js = File.open(filename, 'r') { |f| f.read }
+        rescue Errno::ENOENT
+          @etags_store ||= {}
+        end
       end
-      # If we have no cached version get the normal one.
-      js ||= open(
-        "http://gist.github.com/#{id}.js?file=#{CGI.escape(file)}").read
 
-      # If we don't arleady have a cached and the directory exists create one.
-      File.open(cache, 'w') { |f| f.write(js) } if cache && !File.exists?(cache)
+      # Should we be checking github for this gist?
+      if js.nil? || config['reload_gists']
+        sess = Patron::Session.new
+        sess.timeout = 30
+        sess.base_url = 'http://gist.github.com'
+
+        # Set the etag header if we know that we have a local cache.
+        sess.headers['If-None-Match'] = @etags_store[file_id] if js
+
+        # Fetch the gist data from github, can you dig it?
+        resp = sess.get("/#{id}.js?file=#{CGI.escape(file)}")
+
+        if resp.status == 200
+          js = resp.body
+
+          # If we have the cache_dir setting then assume caching is enabled.
+          if cache_dir
+            File.open(filename, 'w') { |f| f.write(js) }
+
+            # Update the etag stuff.
+            @etags_store[file_id] = resp.headers['ETag']
+            # Write to the store file.
+            File.open(etag_filename, 'w') { |f| YAML::dump(@etags_store, f) }
+          end
+        end
+      end
 
       js = js.match(/document.write\('(<div.+)'\)/)[1]
       js.gsub(/\\"/, '"').gsub(/\\\//, '/').gsub(/\\n/, '')
