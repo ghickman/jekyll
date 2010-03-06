@@ -16,8 +16,10 @@ module Jekyll
     # A very hackish way to handle partials.  We'll go with it till it breaks...
     def include(partial_name)
       file_ext = partial_name[(partial_name.index('.') + 1)..partial_name.length]
-      return '' unless File.exists?("_includes/#{partial_name}")
-      contents = IO.read("_includes/#{partial_name}")
+      filename = File.join(self.site.source, '_includes', partial_name)
+
+      return '' unless File.exists?(filename)
+      contents = IO.read(filename)
 
       case file_ext
       when 'haml'
