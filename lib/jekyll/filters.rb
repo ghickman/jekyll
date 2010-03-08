@@ -112,7 +112,13 @@ module Jekyll
       end
 
       js = js.match(/document.write\('(<div.+)'\)/)[1]
-      js.gsub(/\\"/, '"').gsub(/\\\//, '/').gsub(/\\n/, '')
+      js = js.gsub(/\\"/, '"').gsub(/\\\//, '/').gsub(/\\n/, '');
+      # Attempt to create valid HTML.
+      js = js.gsub(/ id="LC([0-9]+)"/, '').gsub(/ id="gist-([0-9]+)"/, '')
+      js = js.gsub(/<pre>(.*)<\/pre>/) { |s|
+        "<pre>#{$1.gsub(/<div/, '<span').gsub(/<\/div>/, '</span>')}</pre>"
+      }
+      js.gsub(/href="([^"]*)"/) { |s| %Q{href="#{$1.gsub(/\s/, '%20')}"} }
     end
   end
 end
