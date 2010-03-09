@@ -278,6 +278,20 @@ class TestPost < Test::Unit::TestCase
         post = setup_post("2009-05-18-empty-tags.textile")
         assert_equal [], post.tags
       end
+      
+
+      should "recognize extended in yaml" do
+        post = setup_post("2009-10-28-extended-post.markdown")
+        assert_equal "This is an introduction\n\n", post.content
+        assert_equal "\nRest of the post\nid: {{ page.id }}", post.extended
+      end
+
+      should "recognize extended in yaml when no 'extended' string" do
+        post = setup_post("2009-10-28-nonextended-post.markdown")
+        assert_equal "Whole post", post.content
+        assert_equal nil, post.extended
+      end
+
 
       should "allow no yaml" do
         post = setup_post("2009-06-22-no-yaml.textile")
@@ -300,6 +314,13 @@ class TestPost < Test::Unit::TestCase
           assert_equal "<<< <h1>Foo Bar</h1>\n<p>Best <strong>post</strong> ever</p> >>>", post.output
         end
 
+        should "render properly if a extended post" do
+          
+          post = setup_post("2009-10-28-extended-post.markdown")
+          do_render(post)
+          assert_equal "<p>This is an introduction</p>", post.content
+          assert_equal "<p>Rest of the post id: /2009/10/28/extended-post</p>", post.extended
+        end
         should "write properly" do
           post = setup_post("2008-10-18-foo-bar.textile")
           do_render(post)
