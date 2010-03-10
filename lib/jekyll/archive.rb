@@ -7,8 +7,8 @@ module Jekyll
     #
     # Returns <Archive>
     def initialize(site, base, dir, type)
-      unless site.layouts['category_index'].nil?
-        ext = File.extname(site.layouts['category_index'].name)
+      unless site.layouts[type].nil?
+        ext = File.extname(site.layouts[type].name)
       end
       ext ||= '.html'
 
