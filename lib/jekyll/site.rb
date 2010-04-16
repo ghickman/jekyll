@@ -180,7 +180,7 @@ module Jekyll
     end
 
     def read_archives
-      self.collated = self.posts.reverse.inject({}) do |result, post|
+      self.collated = self.posts.inject({}) do |result, post|
         y, m, d = post.date.year, post.date.month, post.date.day
         result[y] ||= {}
         result[y][m] ||= {}
