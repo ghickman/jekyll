@@ -112,7 +112,7 @@ module Jekyll
       end
 
       js = js.match(/document.write\('(<div.+)'\)/)[1]
-      js = js.gsub(/\\"/, '"').gsub(/\\\//, '/').gsub(/\\n/, '');
+      js = js.gsub(/\\"/, '"').gsub(/\\\//, '/').gsub(/\\n/, '').gsub(/\\'/, '');
       # Attempt to create valid HTML.
       js = js.gsub(/ id="LC([0-9]+)"/, '').gsub(/ id="gist-([0-9]+)"/, '')
       js = js.gsub(/<pre>(.*)<\/pre>/) { |s|
