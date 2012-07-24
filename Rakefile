@@ -13,8 +13,6 @@ begin
     s.description = "Jekyll is a simple, blog aware, static site generator."
     s.authors = ["Tom Preston-Werner"]
     s.rubyforge_project = "jekyll"
-    s.files.exclude 'test/dest'
-    s.test_files.exclude 'test/dest'
     s.add_dependency('RedCloth', '>= 4.2.1')
     s.add_dependency('liquid', '>= 1.9.0')
     s.add_dependency('classifier', '>= 1.3.1')
